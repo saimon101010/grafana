@@ -1,0 +1,5 @@
+---
+- name: Start Grafana Service
+  systemd:
+    name: grafana
+    state: started

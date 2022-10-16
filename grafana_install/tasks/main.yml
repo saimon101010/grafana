@@ -1,0 +1,81 @@
+---
+- name: Install vim packages
+  yum:
+    name: vim 
+    state: present
+
+
+- name: Create user 
+  include_tasks: "user.yml"
+
+- name: Download Grafana
+  get_url:
+    url: "{{ source }}"
+    validate_certs: no
+    username: "{{ user }}"
+    password: "{{ pass }}"
+    dest: "{{ install_path }}"
+    timeout: 180
+
+- name: Unpack archive
+  unarchive:
+    src: "{{ install_path }}/{{ distr_ver }}.tar.gz"
+    dest: "{{ install_path }}"
+    remote_src: yes
+
+- name: Rename folder
+  shell: "mv {{ distr_ver }} grafana"
+  args:
+    chdir: "{{ install_path }}"
+
+- name: Change owner to folder
+  file:
+    path: "{{ install_path }}/grafana"
+    owner: grafana
+    group: grafana
+    recurse: yes
+
+- name: Create folder for data 
+  file:
+    path: "{{ install_path }}/data"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create folder for data<-grafana
+  file:
+    path: "{{ install_path }}/data/grafana"
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: 0755
+
+- name: Copy unit file
+  copy:
+    src: grafana.service
+    dest: "/etc/systemd/system/"
+    remote_src: no 
+    owner: root
+    group: root
+    mode: 0664
+
+- name: Enable grafana.service
+  systemd:
+    name: grafana
+    enabled: yes
+    masked: no
+
+- name: Copy grafana.env
+  copy:
+    src: grafana.env
+    dest: "{{ install_path }}/grafana"
+    remote_src: no
+    owner: grafana
+    group: grafana
+    mode: 0644
+  notify:
+    - Start Grafana Service
+
+
+

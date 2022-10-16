@@ -1,0 +1,6 @@
+---
+- name: Create grafana user
+  user:
+    name: grafana
+    shell: /bin/false
+    create_home: no

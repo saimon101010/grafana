@@ -1,0 +1,4 @@
+[grafana-servers]
+
+[grafana-servers:vars]
+ansible_user=

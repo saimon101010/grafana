@@ -1,0 +1,16 @@
+[Unit]
+Description=grafana
+Wants=network-online.target
+After=network-online.target
+[Service]
+Type=notify
+User=grafana
+Group=grafana
+EnvironmentFile=-/app/grafana/grafana.env
+WorkingDirectory=/app/grafana
+RuntimeDirectoryMode=0750
+ExecStart=/app/grafana/bin/grafana-server $OPTIONS
+LimitNOFILE=10000
+Restart=on-failure
+TimeoutStopSec=20
+[Install]
